@@ -1,0 +1,124 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<h2>Sem segurança</h2>
+<div>
+    <input type="button" id="btnValidarSemSeguranca" onclick="callValidarSemSeguranca();" value="Validar" />
+    <input type="button" id="btnExtratoSemSeguranca" onclick="callExtratoSemSeguranca();" value="Extrato" disabled="disabled" />
+</div>
+<div>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Lancamento</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        <tbody id="extratoSemSeguranca"></tbody>
+    </table>
+</div>
+
+<h2>Com segurança</h2>
+<div>
+    <input type="button" id="btnValidarComSeguranca" onclick="callValidarComSeguranca();" value="Validar" />
+    <input type="button" id="btnExtratoComSeguranca" onclick="callExtratoComSeguranca();" value="Extrato" disabled="disabled" />
+</div>
+<div>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Lancamento</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        <tbody id="extratoComSeguranca"></tbody>
+    </table>
+</div>
+
+
+<script type="text/javascript">
+    var dadosSemSeguranca = {};
+    var dadosComSeguranca = {};
+
+    function callValidarSemSeguranca() {
+        $("#btnExtratoSemSeguranca").prop('disabled', true);
+
+        var json = $.getJSON("http://localhost:3270/api/validarsemseguranca?usr=753&pwd=951", function (jsonResult) {
+            dadosSemSeguranca = jsonResult;
+
+            alert("Usuário autorizado!");
+
+            $("#btnValidarSemSeguranca").prop('disabled', true) ;
+            $("#btnExtratoSemSeguranca").prop('disabled', false);
+        });
+
+        json.fail(function (jqxhr, textStatus, error) {
+            var err = textStatus + ", " + error;
+            alert("Request Failed: " + err);
+        });
+    };
+
+    function callExtratoSemSeguranca() {
+        var json = $.post("http://localhost:3270/api/extratosemseguranca", dadosSemSeguranca, function (jsonResult) {
+            $("#extratoSemSeguranca").empty();
+
+            $.each(jsonResult.Lancamentos, function (i, item) {               
+                var tr = $("<tr>");
+
+                tr.append($("<td>").text(item.Data));
+                tr.append($("<td>").text(item.Descricao));
+                tr.append($("<td>").text(item.Valor));
+
+                $("#extratoSemSeguranca").append(tr);
+            });
+        });
+
+        json.fail(function (jqxhr, textStatus, error) {
+            var err = textStatus + ", " + error;
+            alert("Request Failed: " + err);
+        });
+    };
+
+    function callValidarComSeguranca() {
+        $("#btnExtratoComSeguranca").prop('disabled', true);
+
+        var json = $.getJSON("http://localhost:3270/api/validarcomseguranca?usr=753&pwd=951", function (jsonResult) {
+            dadosComSeguranca = jsonResult;
+
+            alert("Usuário autorizado!");
+
+            $("#btnValidarComSeguranca").prop('disabled', true) ;
+            $("#btnExtratoComSeguranca").prop('disabled', false);
+        });
+
+        json.fail(function (jqxhr, textStatus, error) {
+            var err = textStatus + ", " + error;
+            alert("Request Failed: " + err);
+        });
+    };
+
+    function callExtratoComSeguranca() {
+        var json = $.post("http://localhost:3270/api/extratocomseguranca", dadosComSeguranca, function (jsonResult) {
+            $("#extratoComSeguranca").empty();
+
+            $.each(jsonResult.Lancamentos, function (i, item) {
+                var tr = $("<tr>");
+
+                tr.append($("<td>").text(item.Data));
+                tr.append($("<td>").text(item.Descricao));
+                tr.append($("<td>").text(item.Valor));
+
+                $("#extratoComSeguranca").append(tr);
+            });
+        });
+
+        json.fail(function (jqxhr, textStatus, error) {
+            var err = textStatus + ", " + error;
+            alert("Request Failed: " + err);
+        });
+    };
+
+</script>
