@@ -5,13 +5,14 @@ namespace FIAP.SI.Web.API.Models
 {
     public class Extrato
     {
-        public String Conta                
-        { 
-            get; 
-            set; }
+        public String Conta
+        {
+            get;
+            set;
+        }
         public List<ExtratoItem> Lancamentos
-        { 
-            get; 
+        {
+            get;
             set;
         }
 
@@ -22,17 +23,17 @@ namespace FIAP.SI.Web.API.Models
 
         public class ExtratoItem
         {
-            public DateTime Data     
+            public DateTime Data
             {
                 get;
                 set;
             }
-            public String   Descricao
+            public String Descricao
             {
                 get;
                 set;
             }
-            public Decimal  Valor    
+            public Decimal Valor
             {
                 get;
                 set;
