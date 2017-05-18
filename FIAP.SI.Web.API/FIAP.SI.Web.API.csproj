@@ -20,6 +20,7 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -100,6 +101,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Cliente.cs" />
+    <Compile Include="Models\Consolidado.cs" />
     <Compile Include="Models\Extrato.cs" />
     <Compile Include="Models\ModeloSemSeguranca.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -114,7 +117,12 @@
       <DependentUpon>Web.config</DependentUpon>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\FIAP.SI.Crypt\FIAP.SI.Crypt.csproj">
+      <Project>{910e0ce6-e919-466e-9234-d1bc564da8b2}</Project>
+      <Name>FIAP.SI.Crypt</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config">
       <SubType>Designer</SubType>

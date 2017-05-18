@@ -53,3 +53,14 @@ D:\Projetos Pessoais\FIAP.SI.Web\bin\Microsoft.Owin.Security.MicrosoftAccount.xm
 D:\Projetos Pessoais\FIAP.SI.Web\obj\Debug\FIAP.SI.Web.dll
 D:\Projetos Pessoais\FIAP.SI.Web\obj\Debug\FIAP.SI.Web.pdb
 D:\Projetos Pessoais\FIAP.SI.Web\obj\Debug\FIAP.SI.Web.csprojResolveAssemblyReference.cache
+C:\Users\FBarros\Source\Repos\fiapsiwebapi\FIAP.SI.Web\bin\FIAP.SI.Web.dll.config
+C:\Users\FBarros\Source\Repos\fiapsiwebapi\FIAP.SI.Web\bin\FIAP.SI.Web.dll
+C:\Users\FBarros\Source\Repos\fiapsiwebapi\FIAP.SI.Web\bin\FIAP.SI.Web.pdb
+C:\Users\FBarros\Source\Repos\fiapsiwebapi\FIAP.SI.Web\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\FBarros\Source\Repos\fiapsiwebapi\FIAP.SI.Web\bin\Newtonsoft.Json.dll
+C:\Users\FBarros\Source\Repos\fiapsiwebapi\FIAP.SI.Web\bin\Microsoft.Web.Infrastructure.xml
+C:\Users\FBarros\Source\Repos\fiapsiwebapi\FIAP.SI.Web\obj\Debug\FIAP.SI.Web.dll
+C:\Users\FBarros\Source\Repos\fiapsiwebapi\FIAP.SI.Web\obj\Debug\FIAP.SI.Web.pdb
+C:\Users\FBarros\Source\Repos\fiapsiwebapi\FIAP.SI.Web\obj\Debug\FIAP.SI.Web.csprojResolveAssemblyReference.cache
+C:\Users\FBarros\Source\Repos\fiapsiwebapi\FIAP.SI.Web\bin\FIAP.SI.Crypt.dll
+C:\Users\FBarros\Source\Repos\fiapsiwebapi\FIAP.SI.Web\bin\FIAP.SI.Crypt.pdb

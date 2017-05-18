@@ -2,56 +2,113 @@
     ViewBag.Title = "Home Page";
 }
 
-<h2>Sem segurança</h2>
-<div>
-    <input type="button" id="btnValidarSemSeguranca" onclick="callValidarSemSeguranca();" value="Validar" />
-    <input type="button" id="btnExtratoSemSeguranca" onclick="callExtratoSemSeguranca();" value="Extrato" disabled="disabled" />
+<div style="height: 550px; width: 100%;">
+    <div style="float: left; width: 50%;">
+        <h2>Sem segurança</h2>
+        <div>
+            <div>
+                <ul>
+                    <li><label style="display:block;">Agência:</label><input type="text" id="txtAgSemSeguranca" /></li>
+                    <li><label style="display:block;">Conta:  </label><input type="text" id="txtCcSemSeguranca" /></li>
+                    <li><label style="display:block;">Senha:  </label><input type="password" id="txtPwSemSeguranca" /></li>
+                </ul>
+                <input type="button" id="btnValidarSemSeguranca" onclick="callValidarSemSeguranca();" value="Validar" />
+                <input type="button" id="btnExtratoSemSeguranca" onclick="callExtratoSemSeguranca();" value="Extrato" disabled="disabled" />
+            </div>
+        </div>
+        <div>
+            <div>
+                <ul>
+                    <li style="display: inline-block;">Cliente: <span id="lblClSemSeguranca"></span></li>
+                    <li style="display: inline-block;">Ag     : <span id="lblAgSemSeguranca"></span></li>
+                    <li style="display: inline-block;">C/C    : <span id="lblCcSemSeguranca"></span></li>
+                </ul>
+            </div>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Lancamento</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody id="extratoSemSeguranca"></tbody>
+            </table>
+        </div>
+    </div>
+    <div style="float: left; width: 50%;">
+        <h2>Com segurança</h2>
+        <div>
+            <input type="text" id="hdnPkClientComSeguranca" value="@ViewBag.PublicKey" />
+            <input type="text" id="hdnPkServerComSeguranca" />
+            <div>
+                <ul>
+                    <li><label style="display:block;">Agência:</label><input type="text" id="txtAgComSeguranca" /><input type="text" id="txtCryptAgComSeguranca" /></span></li>
+                    <li><label style="display:block;">Conta:  </label><input type="text" id="txtCcComSeguranca" /><input type="text" id="txtCryptCcComSeguranca" /></li>
+                    <li><label style="display:block;">Senha:  </label><input type="password" id="txtPwComSeguranca" /><input type="text" id="txtCryptPwComSeguranca" /></li>
+                </ul>
+                <input type="button" id="btnValidarComSeguranca" onclick="callCryptComSeguranca();" value="Validar" />
+                <input type="button" id="btnExtratoComSeguranca" onclick="callExtratoComSeguranca();" value="Extrato" disabled="disabled" />
+            </div>
+            <div>
+                <div>
+                    <ul>
+                        <li style="display: inline-block;">Cliente: <span id="lblClComSeguranca"></span></li>
+                        <li style="display: inline-block;">Ag     : <span id="lblAgComSeguranca"></span></li>
+                        <li style="display: inline-block;">C/C    : <span id="lblCcComSeguranca"></span></li>
+                    </ul>
+                </div>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Lancamento</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody id="extratoComSeguranca"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
-<div>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Lancamento</th>
-                <th>Valor</th>
-            </tr>
-        </thead>
-        <tbody id="extratoSemSeguranca"></tbody>
-    </table>
-</div>
-
-<h2>Com segurança</h2>
-<div>
-    <input type="button" id="btnValidarComSeguranca" onclick="callValidarComSeguranca();" value="Validar" />
-    <input type="button" id="btnExtratoComSeguranca" onclick="callExtratoComSeguranca();" value="Extrato" disabled="disabled" />
-</div>
-<div>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Lancamento</th>
-                <th>Valor</th>
-            </tr>
-        </thead>
-        <tbody id="extratoComSeguranca"></tbody>
-    </table>
-</div>
-
 
 <script type="text/javascript">
     var dadosSemSeguranca = {};
     var dadosComSeguranca = {};
 
+    window.onload = function () {
+        var jsonServer = $.getJSON("http://localhost:3270/api/handshake?ky=" + encodeURIComponent($("#hdnPkClientComSeguranca").val()), function (jsonResult) {
+            $("#hdnPkServerComSeguranca").val(jsonResult.PK)
+
+            var jsonClient = $.getJSON("http://localhost:3691/home/handshake?&ky=" + encodeURIComponent($("#hdnPkServerComSeguranca").val()), function (jsonResult) {
+            });
+
+            jsonClient.fail(function (jqxhr, textStatus, error) {
+                var err = textStatus + ", " + error;
+                alert("Request Failed: " + err);
+            });
+        });
+
+        jsonServer.fail(function (jqxhr, textStatus, error) {
+            var err = textStatus + ", " + error;
+            alert("Request Failed: " + err);
+        });
+    };
+
     function callValidarSemSeguranca() {
         $("#btnExtratoSemSeguranca").prop('disabled', true);
 
-        var json = $.getJSON("http://localhost:3270/api/validarsemseguranca?usr=753&pwd=951", function (jsonResult) {
+        var json = $.getJSON("http://localhost:3270/api/validarsemseguranca?ag=" + $("#txtAgSemSeguranca").val() + "&cc=" + $("#txtCcSemSeguranca").val() + "&pw=" + $("#txtPwSemSeguranca").val(), function (jsonResult) {
             dadosSemSeguranca = jsonResult;
+
+            $("#lblClSemSeguranca").text(dadosSemSeguranca.Nome);
+            $("#lblAgSemSeguranca").text(dadosSemSeguranca.Agencia);
+            $("#lblCcSemSeguranca").text(dadosSemSeguranca.Conta);
 
             alert("Usuário autorizado!");
 
-            $("#btnValidarSemSeguranca").prop('disabled', true) ;
+            $("#btnValidarSemSeguranca").prop('disabled', true);
             $("#btnExtratoSemSeguranca").prop('disabled', false);
         });
 
@@ -65,7 +122,7 @@
         var json = $.post("http://localhost:3270/api/extratosemseguranca", dadosSemSeguranca, function (jsonResult) {
             $("#extratoSemSeguranca").empty();
 
-            $.each(jsonResult.Lancamentos, function (i, item) {               
+            $.each(jsonResult.Extrato.Lancamentos, function (i, item) {
                 var tr = $("<tr>");
 
                 tr.append($("<td>").text(item.Data));
@@ -82,15 +139,34 @@
         });
     };
 
+    function callCryptComSeguranca() {
+        var json = $.getJSON("http://localhost:3691/home/crypt?ag=" + $("#txtAgComSeguranca").val() + "&cc=" + $("#txtCcComSeguranca").val() + "&pw=" + $("#txtPwComSeguranca").val(), function (jsonResult) {
+            $("#txtCryptAgComSeguranca").val(jsonResult.Ag);
+            $("#txtCryptCcComSeguranca").val(jsonResult.Cc);
+            $("#txtCryptPwComSeguranca").val(jsonResult.Pw);
+
+            callValidarComSeguranca();
+        });
+
+        json.fail(function (jqxhr, textStatus, error) {
+            var err = textStatus + ", " + error;
+            alert("Request Failed: " + err);
+        });
+    };
+
     function callValidarComSeguranca() {
         $("#btnExtratoComSeguranca").prop('disabled', true);
-
-        var json = $.getJSON("http://localhost:3270/api/validarcomseguranca?usr=753&pwd=951", function (jsonResult) {
+        var json = $.getJSON("http://localhost:3270/api/validarcomseguranca?ag=" + encodeURIComponent($("#txtCryptAgComSeguranca").val()) + "&cc=" + encodeURIComponent($("#txtCryptCcComSeguranca").val()) + "&pw=" + encodeURIComponent($("#txtCryptPwComSeguranca").val()), function (jsonResult) {
             dadosComSeguranca = jsonResult;
+
+            ///TODO: Fazer a decodificação do lado do cliente para exibir de forma limpa os textos
+            $("#lblClComSeguranca").text(dadosComSeguranca.Nome);
+            $("#lblAgComSeguranca").text(dadosComSeguranca.Agencia);
+            $("#lblCcComSeguranca").text(dadosComSeguranca.Conta);
 
             alert("Usuário autorizado!");
 
-            $("#btnValidarComSeguranca").prop('disabled', true) ;
+            $("#btnValidarComSeguranca").prop('disabled', true);
             $("#btnExtratoComSeguranca").prop('disabled', false);
         });
 
@@ -101,10 +177,11 @@
     };
 
     function callExtratoComSeguranca() {
+        ///TODO: Codificar (chave publica do servidor) e reenviar os dados para o servidor.
         var json = $.post("http://localhost:3270/api/extratocomseguranca", dadosComSeguranca, function (jsonResult) {
             $("#extratoComSeguranca").empty();
 
-            $.each(jsonResult.Lancamentos, function (i, item) {
+            $.each(jsonResult.Extrato.Lancamentos, function (i, item) {
                 var tr = $("<tr>");
 
                 tr.append($("<td>").text(item.Data));

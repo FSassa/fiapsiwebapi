@@ -9,54 +9,43 @@ namespace FIAP.SI.Web.API.Controllers
 {
     public class SemSegurancaController : ApiController
     {
-        private static readonly String FAKE_CONTA = "12345";
-        private static readonly String FAKE_TOKEN = "852";
-
-        public IHttpActionResult Get()
-        {
-            return Ok();
-        }
-
         [Route("api/validarSemSeguranca")]
         [HttpGet]
-        public IHttpActionResult Validar(String usr, String pwd)
+        public IHttpActionResult Validar(Int32 ag, Int32 cc, String pw)
         {
-            if (String.IsNullOrWhiteSpace(usr) || String.IsNullOrWhiteSpace(pwd))
+            if (0 == ag || 0 == cc || String.IsNullOrWhiteSpace(pw))
             {
                 return BadRequest("Informações inválidas");
             }
 
-            return Ok(new Models.ModeloSemSeguranca { Conta = FAKE_CONTA, Token = FAKE_TOKEN });
+            Models.Cliente cli
+                = Models.Cliente.Consultar(ag, cc, pw);
+
+            return Ok(cli);
         }
 
         [Route("api/extratoSemSeguranca")]
         [HttpPost]
-        public IHttpActionResult Extrato(Models.ModeloSemSeguranca mdl)
+        public IHttpActionResult Extrato(Models.Cliente cli)
         {
-            if (null == mdl)
+            if (null == cli)
             {
                 return BadRequest("Informações inválidas");
             }
 
-            Models.Extrato result
-                = new Models.Extrato();
+            Models.Consolidado consolidacao
+                = new Models.Consolidado(cli);
 
-            result.Conta
-                = FAKE_CONTA;
-
-            for (Int32 i = 0; i < 10; i++)
+            try
             {
-                Models.Extrato.ExtratoItem item
-                    = new Models.Extrato.ExtratoItem();
+                consolidacao.Preparar();
 
-                item.Data = DateTime.Today.AddDays(-i);
-                item.Descricao = String.Format("Lançamento {0}", i);
-                item.Valor = i * 1000m + 1000m;
-
-                result.Lancamentos.Add(item);
+                return Ok(consolidacao);
             }
-
-            return Ok(result);
+            catch (Exception uhEx)
+            {
+                return BadRequest(uhEx.Message);
+            }
         }
     }
 }

@@ -4,102 +4,98 @@ using System.Text;
 using System.Web.Http;
 using System.Collections.Generic;
 
+using System.Security.Cryptography;
+using FIAP.SI.Crypt;
+
 namespace FIAP.SI.Web.API.Controllers
 {
     public class ComSegurancaController : ApiController
     {
-        private static readonly String FAKE_CONTA = "12345";
+        private const Int32 KEYSIZE = 1024;
 
-        private static readonly Dictionary<String, Models.ModeloSemSeguranca> Session
-            = new Dictionary<string, Models.ModeloSemSeguranca>();
+        public static string _publicKey;
+        public static string _publicAndPrivateKey;
 
-        public IHttpActionResult Get()
+        public static string _publicClientKey;
+
+        static ComSegurancaController()
         {
-            return Ok();
+            AsymmetricEncryption.GenerateKeys(KEYSIZE, out _publicKey, out _publicAndPrivateKey);
+        }
+
+        [Route("api/handShake")]
+        [HttpGet]
+        public IHttpActionResult HandShake(String ky)
+        {
+            _publicClientKey = ky;
+
+            return Ok(new { PK = _publicKey });
         }
 
         [Route("api/validarComSeguranca")]
         [HttpGet]
-        public IHttpActionResult Validar(String usr, String pwd)
+        public IHttpActionResult Validar(String ag, String cc, String pw)
         {
-            if (String.IsNullOrWhiteSpace(usr) || String.IsNullOrWhiteSpace(pwd))
+            if (String.IsNullOrWhiteSpace(ag) || String.IsNullOrWhiteSpace(cc) || String.IsNullOrWhiteSpace(pw))
             {
                 return BadRequest("Informações inválidas");
             }
 
-            Models.ModeloSemSeguranca mdl = new Models.ModeloSemSeguranca();
+            String agDecrypt = Decrypt(ag);
+            String ccDecrypt = Decrypt(cc);
+            String pwDecrypt = Decrypt(pw);
 
-            mdl.Conta = FAKE_CONTA;
-            mdl.Token = Guid.NewGuid().ToString();
+            Models.Cliente cli
+                = Models.Cliente.Consultar(Int32.Parse(agDecrypt), Int32.Parse(ccDecrypt), pwDecrypt);
 
-            Session.Add(usr, mdl);
+            var cliCrypt = new { Agencia = EncryptToClient(cli.Agencia.ToString()), Conta = EncryptToClient(cli.Conta.ToString()), Senha = EncryptToClient(cli.Senha), Nome = EncryptToClient(cli.Nome) };
 
-            return Ok(new Models.ModeloSemSeguranca { Conta = Encrypt(mdl.Conta), Token = Encrypt(mdl.Token) });
+            return Ok(cliCrypt);
         }
 
         [Route("api/extratoComSeguranca")]
         [HttpPost]
-        public IHttpActionResult Extrato(Models.ModeloSemSeguranca mdl)
+        public IHttpActionResult Extrato(Models.Cliente cli)
         {
-            String conta = null;
-            String token = null;
-
-            if (null == mdl)
+            if (null == cli)
             {
                 return BadRequest("Informações inválidas");
             }
+
+            Models.Consolidado consolidacao
+                = new Models.Consolidado(cli);
 
             try
             {
-                conta = Decrypt(mdl.Conta);
-                token = Decrypt(mdl.Token);
+                consolidacao.Preparar();
+
+                return Ok(consolidacao);
             }
-            catch
+            catch (Exception uhEx)
             {
-                return BadRequest("Informações inválidas");
+                return BadRequest(uhEx.Message);
             }
-
-            Models.ModeloSemSeguranca chaveUsuario
-                = Session.Values.FirstOrDefault(v => conta.Equals(v.Conta) && token.Equals(v.Token));
-
-            if (null == chaveUsuario)
-            {
-                return BadRequest("Informações inválidas");
-            }
-
-            Models.Extrato result
-                = new Models.Extrato();
-
-            result.Conta
-                = chaveUsuario.Conta;
-
-            for (Int32 i = 0; i < 10; i++)
-            {
-                Models.Extrato.ExtratoItem item
-                    = new Models.Extrato.ExtratoItem();
-
-                item.Data = DateTime.Today.AddDays(-i);
-                item.Descricao = String.Format("Lançamento {0}", i);
-                item.Valor = i * 1000m + 1000m;
-
-                result.Lancamentos.Add(item);
-            }
-
-            return Ok(result);
         }
 
         String Encrypt(String text)
         {
-            byte[] base64Array = Encoding.Default.GetBytes( text);
-            
-            return Convert.ToBase64String(base64Array.Reverse().ToArray());
+            String encrypted = AsymmetricEncryption.EncryptText(text, KEYSIZE, _publicKey);
+
+            return encrypted;
+        }
+
+        String EncryptToClient(String text)
+        {
+            String encrypted = AsymmetricEncryption.EncryptText(text, KEYSIZE, _publicClientKey);
+
+            return encrypted;
         }
 
         String Decrypt(String text)
         {
-            byte[] base64Array = Convert.FromBase64String(text);
+            String encrypted = AsymmetricEncryption.DecryptText(text, KEYSIZE, _publicAndPrivateKey);
 
-            return Encoding.Default.GetString(base64Array.Reverse().ToArray());
+            return encrypted;
         }
     }
 }

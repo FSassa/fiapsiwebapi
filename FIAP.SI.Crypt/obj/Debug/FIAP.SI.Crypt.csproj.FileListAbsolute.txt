@@ -1,0 +1,4 @@
+C:\Users\FBarros\Source\Repos\fiapsiwebapi\FIAP.SI.Crypt\bin\Debug\FIAP.SI.Crypt.dll
+C:\Users\FBarros\Source\Repos\fiapsiwebapi\FIAP.SI.Crypt\bin\Debug\FIAP.SI.Crypt.pdb
+C:\Users\FBarros\Source\Repos\fiapsiwebapi\FIAP.SI.Crypt\obj\Debug\FIAP.SI.Crypt.dll
+C:\Users\FBarros\Source\Repos\fiapsiwebapi\FIAP.SI.Crypt\obj\Debug\FIAP.SI.Crypt.pdb
